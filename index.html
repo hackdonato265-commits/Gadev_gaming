@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Web de Videojuegos</title>
+    <style>
+        /* ==========================================
+           ESTILOS NEOBRUTALISTAS Y CONFIGURACIÓN BASE
+           ========================================== */
+        :root {
+            --bg-color: #F7F3E8;
+            --text-color: #171717;
+            --primary: #4169FF;
+            --accent: #FFE45C;
+            --card-bg: #FFFFFF;
+            --card-alt: #FFF9E6;
+            --border-color: #171717;
+            --shadow-color: #171717;
+            --grid-color: rgba(23, 23, 23, 0.08);
+            --grid-type: linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                         linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            --grid-size: 24px 24px;
+            --download: #B8F56A;
+        }
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #F7F3E8;
+            --primary: #5A7CFF;
+            --accent: #FFD43B;
+            --card-bg: #1E1E1E;
+            --card-alt: #2A2A2A;
+            --border-color: #F7F3E8;
+            --shadow-color: #000000;
+            --grid-color: rgba(247, 243, 232, 0.08);
+            --download: #8BC34A;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: var(--grid-type);
+            background-size: var(--grid-size);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .top-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: -10px;
+        }
+        .control-btn {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-color);
+        }
+        .control-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--shadow-color);
+        }
+        /* ==========================================
+           SECCIÓN DE PERFIL
+           ========================================== */
+        .profile-card {
+            background-color: var(--card-bg);
+            border: 3px solid var(--border-color);
+            box-shadow: 5px 5px 0px var(--shadow-color);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        .external-arrow-link {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            border: 2px solid var(--border-color);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #FFFFFF;
+        }
+        .external-arrow-link:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px var(--shadow-color);
+        }
+        .external-arrow-link:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--shadow-color);
+        }
+        .external-arrow-link svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 3;
+            fill: none;
+        }
+        .profile-pic-container {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 3px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--shadow-color);
+            overflow: hidden;
+            background-color: var(--card-alt);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-pic-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-placeholder-icon {
+            font-size: 40px;
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+        .profile-name {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .profile-username {
+            font-size: 14px;
+            font-weight: 700;
+            opacity: 0.7;
+            margin-bottom: 12px;
+        }
+        .profile-description {
+            font-size: 15px;
+            line-height: 1.4;
+            max-width: 420px;
+            opacity: 0.9;
+        }
+        /* ==========================================
+           ENLACES PERSONALES OPCIONALES
+           ========================================== */
+        .personal-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .link-card {
+            background-color: var(--card-alt);
+            border: 3px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--shadow-color);
+            border-radius: 10px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 800;
+            font-size: 16px;
+        }
+        .link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0px var(--shadow-color);
+            background-color: var(--accent);
+        }
+        .link-card:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--shadow-color);
+        }
+        /* ==========================================
+           SECCIÓN "MIS JUEGOS"
+           ========================================== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            border-bottom: 3px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+        .section-badge {
+            background-color: var(--accent);
+            color: #171717;
+            border: 2px solid var(--border-color);
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 900;
+            border-radius: 4px;
+        }
+        .games-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .empty-state {
+            background-color: var(--card-bg);
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 32px 20px;
+            text-align: center;
+            opacity: 0.8;
+            font-weight: 600;
+        }
+        .config-error {
+            background-color: #FFE0E0;
+            border: 3px solid #CC0000;
+            color: #8B0000;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        [data-theme="dark"] .config-error {
+            background-color: #3D1515;
+            color: #FFB3B3;
+            border-color: #FF6B6B;
+        }
+        /* Tarjeta de juego individual */
+        .game-card {
+            background-color: var(--card-bg);
+            border: 3px solid var(--border-color);
+            box-shadow: 5px 5px 0px var(--shadow-color);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .game-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 7px 7px 0px var(--shadow-color);
+        }
+        .game-cover {
+            width: 100%;
+            height: 180px;
+            background-color: var(--card-alt);
+            border-bottom: 3px solid var(--border-color);
+            object-fit: cover;
+            display: block;
+        }
+        .game-cover-placeholder {
+            width: 100%;
+            height: 180px;
+            background-color: var(--card-alt);
+            border-bottom: 3px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            opacity: 0.4;
+        }
+        .game-content {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+        .game-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .game-title {
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            word-break: break-word;
+        }
+        .game-platform {
+            background-color: var(--primary);
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 6px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .game-description {
+            font-size: 14px;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+        /* Acciones de las tarjetas de juegos */
+        .game-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .btn-game {
+            background-color: var(--accent);
+            color: #171717;
+            border: 2px solid var(--border-color);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            padding: 10px 16px;
+            font-weight: 900;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .btn-game:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--shadow-color);
+        }
+        .btn-game svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            fill: none;
+        }
+        /* Botones de las tarjetas */
+        .btn-download {
+            background-color: var(--download);
+            color: #171717;
+            margin-left: auto;
+        }
+        .btn-play {
+            background-color: var(--accent);
+        }
+        .btn-hidden {
+            visibility: hidden;
+        }
+        footer {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            opacity: 0.6;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Complementos: cuenta y administración de juegos */
+        .account-area{display:flex;align-items:center;gap:8px;margin-right:auto}
+        .account-avatar{width:38px;height:38px;border:2px solid var(--border-color);border-radius:50%;background:#fff;color:#4285f4;font-weight:800;font-size:20px;cursor:pointer;display:grid;place-items:center;box-shadow:2px 2px 0 var(--shadow-color)}
+        .account-name{font-size:13px;font-weight:700;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .modal-backdrop{position:fixed;inset:0;background:#0009;z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+        .modal-backdrop.open{display:flex}
+        .portal-modal{background:var(--card-bg);color:var(--text-color);border:3px solid var(--border-color);box-shadow:7px 7px 0 var(--shadow-color);border-radius:12px;width:min(100%,520px);max-height:90vh;overflow:auto;padding:22px;display:flex;flex-direction:column;gap:12px}
+        .portal-modal h2{font-size:22px}.portal-modal input,.portal-modal textarea,.portal-modal select{width:100%;padding:10px;border:2px solid var(--border-color);border-radius:6px;background:var(--bg-color);color:var(--text-color);font:inherit}
+        .portal-modal label{font-size:13px;font-weight:700;display:flex;flex-direction:column;gap:5px}
+        .portal-actions{display:flex;gap:8px;flex-wrap:wrap}.portal-actions button{flex:1;justify-content:center}
+        .portal-message{font-size:13px;overflow-wrap:anywhere}.admin-game-row{border:2px solid var(--border-color);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
+        .admin-game-row h3{font-size:16px}.small-muted{font-size:12px;opacity:.7}
+        .game-code-input{min-height:180px;max-height:320px;resize:vertical;font-family:monospace;font-size:12px;line-height:1.4;white-space:pre;overflow:auto}
+        #game-player-modal .portal-modal{width:min(100%,1100px);height:90vh;max-height:90vh;padding:12px}
+        .game-player-frame-wrap{flex:1;min-height:0;overflow:auto;border:2px solid var(--border-color);border-radius:8px;background:#fff}
+        #game-player-frame{display:block;width:100%;height:100%;min-height:60vh;border:0;background:#fff}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- CONTROLES: MODO OSCURO Y TIPO DE CUADRÍCULA -->
+        <div class="top-controls">
+            <div class="account-area" id="account-area"><button class="control-btn" id="login-open-btn" type="button">↪ Iniciar sesión</button></div>
+            <button class="control-btn" id="grid-toggle-btn" title="Cambiar Grid / Puntos">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                </svg>
+                <span id="grid-label">Cuadrícula</span>
+            </button>
+            <button class="control-btn" id="theme-toggle-btn" title="Cambiar Tema Claro/Oscuro">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <span id="theme-label">Tema</span>
+            </button>
+        </div>
+
+        <!-- PERFIL -->
+        <header class="profile-card">
+            <a href="https://github.com/tu-usuario" class="external-arrow-link" id="profile-arrow" target="_blank" rel="noopener noreferrer" title="Enlace externo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M7 17L17 7M17 7H7M17 7V17" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            <div class="profile-pic-container">
+                <img src="perfil.png" alt="Foto de perfil" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="profile-placeholder-icon" style="display:none;">&#128126;</div>
+            </div>
+            <h1 class="profile-name" id="profile-name">ElWomenDev</h1>
+            <p class="profile-username" id="profile-username">@sectaarcoiris243</p>
+            <p class="profile-description" id="profile-description">Desarrollador indie/html de videojuegos. Creando experiencias únicas para móviles y PC.</p>
+        </header>
+
+        <!-- ENLACES PERSONALES OPCIONALES -->
+        <section class="personal-links" id="personal-links">
+            <!-- Ejemplo:
+            <a href="https://itch.io" class="link-card" target="_blank" rel="noopener noreferrer">
+                <span>Mi perfil en Itch.io</span>
+                <span>&#8599;</span>
+            </a>
+            -->
+        </section>
+
+        <!-- SECCIÓN "MIS GAMES" — se genera automáticamente desde config/juegos.js -->
+        <div class="section-header">
+            <h2 class="section-title">Mis Juegos</h2>
+            <span class="section-badge" id="games-count">0</span>
+        </div>
+        <section class="games-container" id="my-games">
+            <!-- Los juegos se cargan automáticamente aquí -->
+        </section>
+
+    </div>
+
+    <!-- ============================================================
+         CARGA DEL ARCHIVO DE CONFIGURACIÓN DE JUEGOS
+         Edita config/juegos.js para añadir tus juegos.
+         ============================================================ -->
+    <script src="config/juegos.js"></script>
+
+    <script>
+    (function() {
+        var themeToggleBtn = document.getElementById('theme-toggle-btn');
+        var themeLabel = document.getElementById('theme-label');
+        var currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeLabel.textContent = 'Claro';
+        } else {
+            themeLabel.textContent = 'Oscuro';
+        }
+        themeToggleBtn.addEventListener('click', function() {
+            var theme = document.documentElement.getAttribute('data-theme');
+            if (theme === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                themeLabel.textContent = 'Oscuro';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeLabel.textContent = 'Claro';
+            }
+        });
+
+        var gridToggleBtn = document.getElementById('grid-toggle-btn');
+        var gridLabel = document.getElementById('grid-label');
+        var gridState = localStorage.getItem('gridType') || 'lines';
+        function updateGridStyle(type) {
+            var root = document.documentElement;
+            if (type === 'dots') {
+                root.style.setProperty('--grid-type', 'radial-gradient(var(--grid-color) 1.5px, transparent 1.5px)');
+                root.style.setProperty('--grid-size', '20px 20px');
+                gridLabel.textContent = 'Puntos';
+            } else {
+                root.style.setProperty('--grid-type', 'linear-gradient(to right, var(--grid-color) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px)');
+                root.style.setProperty('--grid-size', '24px 24px');
+                gridLabel.textContent = 'Cuadrícula';
+            }
+        }
+        updateGridStyle(gridState);
+        gridToggleBtn.addEventListener('click', function() {
+            gridState = gridState === 'lines' ? 'dots' : 'lines';
+            localStorage.setItem('gridType', gridState);
+            updateGridStyle(gridState);
+        });
+    })();
+    </script>
+
+    <!-- Cuenta y panel de administración. La cuenta local se guarda en este navegador. -->
+    <div class="modal-backdrop" id="account-modal" role="dialog" aria-modal="true" aria-label="Cuenta">
+      <div class="portal-modal" id="account-modal-content">
+        <h2 id="account-modal-title">Iniciar sesión</h2>
+        <p class="small-muted">Tu perfil tendrá un ID propio dentro de esta web.</p>
+        <label>Correo electrónico<input id="account-email" type="email" autocomplete="email" placeholder="tu@correo.com"></label>
+        <label>Contraseña<input id="account-password" type="password" autocomplete="current-password" placeholder="Contraseña"></label>
+        <label id="account-name-wrap" hidden>Nombre visible<input id="account-display-name" type="text" placeholder="Cómo te llamas"></label>
+        <p class="portal-message" id="account-message" aria-live="polite"></p>
+        <div class="portal-actions"><button class="control-btn" id="account-submit">Iniciar sesión</button><button class="control-btn" id="account-switch">Crear cuenta</button><button class="control-btn" id="account-close">Cerrar</button></div>
+        <p class="small-muted">Nota: esta versión estática guarda la cuenta solo en el navegador actual; no es una autenticación segura ni sincroniza entre dispositivos.</p>
+      </div>
+    </div>
+    <div class="modal-backdrop" id="profile-modal" role="dialog" aria-modal="true" aria-label="Perfil de usuario">
+      <div class="portal-modal"><h2>Tu perfil</h2><p id="profile-modal-name"></p><p id="profile-modal-email"></p><p><strong>Tu ID:</strong> <code id="profile-modal-id"></code></p><div class="portal-actions"><button class="control-btn" id="copy-id-btn">Copiar ID</button><button class="control-btn" id="admin-open-btn" hidden>Administrar juegos</button><button class="control-btn" id="logout-btn">Cerrar sesión</button><button class="control-btn" id="profile-close-btn">Cerrar</button></div></div>
+    </div>
+    <div class="modal-backdrop" id="game-player-modal" role="dialog" aria-modal="true" aria-label="Juego">
+      <div class="portal-modal"><div class="portal-actions" style="align-items:center"><h2 id="game-player-title" style="margin-right:auto">Juego</h2><button class="control-btn" id="game-player-close">Cerrar juego</button></div><div class="game-player-frame-wrap"><iframe id="game-player-frame" title="Juego HTML" sandbox="allow-scripts allow-forms allow-pointer-lock" scrolling="yes"></iframe></div></div>
+    </div>
+    <div class="modal-backdrop" id="admin-modal" role="dialog" aria-modal="true" aria-label="Administrar juegos">
+      <div class="portal-modal"><h2>Panel de administración</h2><p class="small-muted">Edita títulos, descripciones, portadas y archivos de los juegos. Los cambios se guardan en este navegador.</p>
+        <div id="admin-games-list"></div>
+        <div class="admin-game-row"><h3>Añadir juego HTML</h3>
+          <label>Nombre del juego<input id="new-game-name" placeholder="Mi juego"></label>
+          <label>Código HTML completo del juego<textarea id="new-game-code" class="game-code-input" rows="10" placeholder="Pega aquí el HTML completo de tu juego, desde &lt;!DOCTYPE html&gt; hasta &lt;/html&gt;"></textarea></label>
+          <label>Descripción<textarea id="new-game-desc" rows="2" placeholder="De qué trata el juego"></textarea></label>
+          <label>Imagen de portada (ruta o URL)<input id="new-game-cover" placeholder="imagenes/portada.png o https://..."></label>
+          <label>Plataforma<input id="new-game-platform" value="HTML5 / Web"></label>
+          <div class="portal-actions"><button class="control-btn" id="add-game-btn">Añadir juego</button></div>
+        </div>
+        <p class="portal-message" id="admin-message" aria-live="polite"></p>
+        <div class="portal-actions"><button class="control-btn" id="admin-reset-btn">Restaurar configuración inicial</button><button class="control-btn" id="admin-close-btn">Cerrar panel</button></div>
+      </div>
+    </div>
+    <script>
+    (function(){
+      'use strict';
+      // Pega aquí tu ID de administrador. El ID se asigna al crear una cuenta.
+      const OO_ADMIN_ID = 'USR-MV78JE44-ONI3U';
+      const $ = id => document.getElementById(id);
+      const read = (key, fallback) => { try { const v=JSON.parse(localStorage.getItem(key)); return v===null?fallback:v; } catch(e){return fallback;} };
+      const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+      let mode='login';
+      const getAccounts=()=>read('portal_accounts',[]);
+      const getSession=()=>read('portal_session',null);
+      const makeId=()=> 'USR-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
+      function open(id){$(id).classList.add('open');}
+      function close(id){$(id).classList.remove('open');}
+      function isAdmin(user){return !!user && OO_ADMIN_ID!=='PEGA_AQUI_TU_ADMIN_ID' && user.id===OO_ADMIN_ID;}
+      function renderAccount(){
+        const area=$('account-area'); area.innerHTML=''; const user=getSession();
+        if(!user){const b=document.createElement('button');b.className='control-btn';b.textContent='↪ Iniciar sesión';b.onclick=()=>{setMode('login');open('account-modal');};area.appendChild(b);return;}
+        const avatar=document.createElement('button');avatar.className='account-avatar';avatar.title='Abrir perfil';avatar.setAttribute('aria-label','Abrir perfil');avatar.textContent='G';avatar.style.color='#4285f4';avatar.onclick=showProfile;area.appendChild(avatar);
+        const name=document.createElement('span');name.className='account-name';name.textContent=user.name||user.email;area.appendChild(name);
+      }
+      function setMode(next){mode=next;$('account-modal-title').textContent=mode==='login'?'Iniciar sesión':'Crear cuenta';$('account-submit').textContent=mode==='login'?'Iniciar sesión':'Crear cuenta';$('account-switch').textContent=mode==='login'?'Crear cuenta':'Ya tengo cuenta';$('account-name-wrap').hidden=mode==='login';$('account-message').textContent='';$('account-password').autocomplete=mode==='login'?'current-password':'new-password';}
+      $('login-open-btn')?.addEventListener('click',()=>{setMode('login');open('account-modal');});
+      $('account-close').onclick=()=>close('account-modal');
+      $('account-switch').onclick=()=>setMode(mode==='login'?'signup':'login');
+      $('account-submit').onclick=()=>{
+        const email=$('account-email').value.trim().toLowerCase(), password=$('account-password').value, accounts=getAccounts();
+        if(!email||!email.includes('@')||password.length<4){$('account-message').textContent='Escribe un correo válido y una contraseña de al menos 4 caracteres.';return;}
+        if(mode==='signup'){
+          if(accounts.some(a=>a.email===email)){$('account-message').textContent='Ya existe una cuenta con ese correo en este navegador.';return;}
+          const user={id:makeId(),email,name:$('account-display-name').value.trim()||email.split('@')[0],password};accounts.push(user);write('portal_accounts',accounts);write('portal_session',{id:user.id,email:user.email,name:user.name});
+        } else {const user=accounts.find(a=>a.email===email&&a.password===password);if(!user){$('account-message').textContent='Correo o contraseña incorrectos, o la cuenta no existe en este navegador.';return;}write('portal_session',{id:user.id,email:user.email,name:user.name});}
+        close('account-modal');renderAccount();
+      };
+      function showProfile(){const user=getSession();if(!user)return; $('profile-modal-name').textContent='Nombre: '+(user.name||'Usuario');$('profile-modal-email').textContent='Correo: '+user.email;$('profile-modal-id').textContent=user.id;const adminButton=$('admin-open-btn');const allowed=isAdmin(user);adminButton.hidden=!allowed;adminButton.style.display=allowed?'':'none';close('admin-modal');open('profile-modal');}
+      $('profile-close-btn').onclick=()=>close('profile-modal');$('copy-id-btn').onclick=()=>{const id=$('profile-modal-id').textContent;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(id).then(()=>{$('copy-id-btn').textContent='ID copiado';}).catch(()=>prompt('Copia tu ID:',id));}else prompt('Copia tu ID:',id);};
+      $('logout-btn').onclick=()=>{localStorage.removeItem('portal_session');close('profile-modal');renderAccount();};
+      const initialGames=()=>{if(typeof MIS_JUEGOS==='undefined')return [];return MIS_JUEGOS.map(g=>({...g,archivo:(g.archivo||'').replace(/^\/?(juegos|htmlgames|htmlfoto)\//,''),codigo:g.codigo||'',tipo:'html',portada:g.portada||''})).filter(g=>g.archivo||g.codigo);};
+      function getGames(){const saved=read('portal_games_override',null);return Array.isArray(saved)?saved:initialGames();}
+      function redraw(){const list=getGames();const box=$('my-games');box.innerHTML='';if(!list.length){box.innerHTML='<div class="empty-state"><p>No hay juegos disponibles.</p></div>';}$('games-count').textContent=list.length;list.forEach(g=>{
+        const card=document.createElement('div');card.className='game-card';
+        if(g.portada){const img=document.createElement('img');img.className='game-cover';img.src=/^(https?:|data:|\/)/i.test(g.portada)?g.portada:(g.portada.startsWith('imagenes/')?g.portada:'imagenes/'+g.portada);img.alt='Portada de '+g.nombre;img.onerror=()=>{img.style.display='none';};card.appendChild(img);}else{const ph=document.createElement('div');ph.className='game-cover-placeholder';ph.textContent='🎮';card.appendChild(ph);}
+        const content=document.createElement('div');content.className='game-content';const row=document.createElement('div');row.className='game-header-row';const h=document.createElement('h3');h.className='game-title';h.textContent=g.nombre||'Juego sin nombre';row.appendChild(h);if(g.plataforma){const tag=document.createElement('span');tag.className='game-platform';tag.textContent=g.plataforma;row.appendChild(tag);}content.appendChild(row);if(g.descripcion){const d=document.createElement('p');d.className='game-description';d.textContent=g.descripcion;content.appendChild(d);}const actions=document.createElement('div');actions.className='game-actions';const play=document.createElement('button');play.type='button';play.className='btn-game btn-play';play.textContent='▶ Jugar';play.addEventListener('click',()=>playGame(g));actions.appendChild(play);content.appendChild(actions);card.appendChild(content);box.appendChild(card);
+      });}
+      function playGame(game){
+        const frame=$('game-player-frame');$('game-player-title').textContent=game.nombre||'Juego';
+        frame.removeAttribute('src');frame.srcdoc='';
+        if(game.codigo){frame.srcdoc=game.codigo;}
+        else if(game.archivo){const path=String(game.archivo).replace(/^\/+/, '');if(/^(https?:\/\/)/i.test(path)){frame.src=path;}else{frame.src='htmlfoto/'+path;}}
+        else{return;}
+        open('game-player-modal');
+      }
+      $('game-player-close').onclick=()=>{close('game-player-modal');const frame=$('game-player-frame');frame.srcdoc='';frame.removeAttribute('src');};
+      $('game-player-modal').addEventListener('click',e=>{if(e.target===$('game-player-modal')){$('game-player-close').click();}});
+      function renderAdminList(){const list=getGames(), root=$('admin-games-list');root.innerHTML='';list.forEach((g,i)=>{const row=document.createElement('div');row.className='admin-game-row';const h=document.createElement('h3');h.textContent=(i+1)+'. '+(g.nombre||'Juego');row.appendChild(h);const fields=[['Nombre','nombre',g.nombre,'input'],['Código HTML completo','codigo',g.codigo,'textarea'],['Descripción','descripcion',g.descripcion,'textarea'],['Portada (ruta o URL)','portada',g.portada,'input'],['Plataforma','plataforma',g.plataforma,'input']];fields.forEach(([label,key,value,type])=>{const lab=document.createElement('label');lab.textContent=label;const input=type==='textarea'?document.createElement('textarea'):document.createElement('input');input.value=value||'';if(key==='descripcion')input.rows=2;if(key==='codigo'){input.rows=10;input.className='game-code-input';input.placeholder='Pega aquí el HTML completo';}input.dataset.key=key;lab.appendChild(input);row.appendChild(lab);});const actions=document.createElement('div');actions.className='portal-actions';const save=document.createElement('button');save.className='control-btn';save.textContent='Guardar cambios';save.onclick=()=>{if(!isAdmin(getSession())){close('admin-modal');return;}const updated=getGames();row.querySelectorAll('[data-key]').forEach(el=>updated[i][el.dataset.key]=el.value.trim());updated[i].tipo='html';write('portal_games_override',updated);redraw();renderAdminList();$('admin-message').textContent='Cambios guardados.';};const del=document.createElement('button');del.className='control-btn';del.textContent='Eliminar';del.onclick=()=>{if(!isAdmin(getSession())){close('admin-modal');return;}if(confirm('¿Eliminar este juego de la lista?')){const updated=getGames();updated.splice(i,1);write('portal_games_override',updated);redraw();renderAdminList();}};actions.append(save,del);row.appendChild(actions);root.appendChild(row);});}
+      $('admin-open-btn').onclick=()=>{const user=getSession();if(!isAdmin(user)){close('admin-modal');$('admin-open-btn').hidden=true;$('admin-open-btn').style.display='none';return;}close('profile-modal');renderAdminList();open('admin-modal');};$('admin-close-btn').onclick=()=>close('admin-modal');
+      $('add-game-btn').onclick=()=>{if(!isAdmin(getSession())){close('admin-modal');return;}const nombre=$('new-game-name').value.trim(),codigo=$('new-game-code').value.trim();if(!nombre||!codigo){$('admin-message').textContent='Escribe el nombre y pega el código HTML completo del juego.';return;}if(!/<html[\s>]/i.test(codigo)&&!/<body[\s>]/i.test(codigo)){$('admin-message').textContent='Pega un documento HTML válido, incluyendo su contenido.';return;}const games=getGames();games.push({nombre,codigo,archivo:'',descripcion:$('new-game-desc').value.trim(),portada:$('new-game-cover').value.trim(),plataforma:$('new-game-platform').value.trim()||'HTML5 / Web',tipo:'html'});write('portal_games_override',games);['new-game-name','new-game-code','new-game-desc','new-game-cover'].forEach(id=>$(id).value='');redraw();renderAdminList();$('admin-message').textContent='Juego añadido y guardado en este navegador.';};
+      $('admin-reset-btn').onclick=()=>{if(!isAdmin(getSession())){close('admin-modal');return;}if(confirm('¿Restaurar los juegos del archivo config/juegos.js? Se perderán los cambios guardados localmente.')){localStorage.removeItem('portal_games_override');redraw();renderAdminList();$('admin-message').textContent='Configuración inicial restaurada.';}};
+      // Re-render inicial usa los juegos guardados en localStorage si existen.
+      renderAccount();redraw();
+    })();
+    </script>
+
+</body>
+</html>
